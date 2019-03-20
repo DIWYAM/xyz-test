@@ -13,7 +13,20 @@ router.get('/',ensureAuthenticatedAdmin(),(req,res)=>{
 });
 
 router.get('/city',ensureAuthenticatedAdmin(),(req,res)=>{
-    res.render('admin/city');
+    pool.getConnection((err,db)=>{
+        if(err) throw err;
+        else{
+            db.query('SELECT city,state FROM cities',(err,result)=>{
+                if(err) throw err;
+                else{
+                    req.session.city = result;
+                    res.render('admin/city',{
+                        city:result
+                    });
+                }
+            });
+        }
+    });
 });
 
 router.get('/addFleet',ensureAuthenticatedAdmin(),(req,res)=>{
@@ -232,7 +245,33 @@ router.get('/display/:type/:pic',ensureAuthenticatedAdmin(),(req,res)=>{
 });
 
 router.post('/addCity',(req,res,next)=>{
-    console.log(req.body);
+    pool.getConnection((err,db)=>{
+        if(err) throw err;
+        else{
+            var sqlquery = 'SELECT city FROM cities where city = ?';
+            db.query(sqlquery,[req.body.city],(err,result)=>{
+                if(err) throw err;
+                else if(result.length){
+                    req.flash('error_msg','City already registered');
+                    res.redirect('/admin/city');
+                }
+                else{
+                    var city = {
+                        city:req.body.city,
+                        state:req.body.state
+                    }
+                    var sqlquery1 = 'INSERT INTO cities (state,city) VALUES (?,?)';
+                    db.query(sqlquery1,[city.state,city.city],(err,result)=>{
+                        if(err) throw err;
+                        else{
+                            req.flash('success_msg','City Added');
+                            res.redirect(`/admin/city`);
+                        }
+                    });
+                }
+            });
+        }
+    })
 });
 
 router.get('/logout',(req,res)=>{
