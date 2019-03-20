@@ -1,0 +1,145 @@
+<% include ../partials/header %>
+<% include ../partials/sidebar %>
+
+<div class="content">
+    <div class="row">
+        <div class="col-md-12">
+          <div class="card">
+            <div class="card-header">
+              <h5>City</h5>
+            </div>
+            <div class="card-body">
+              <div class="nav-tabs-navigation">
+                <div class="nav-tabs-wrapper">
+                  <ul id="tabs" class="nav nav-tabs" role="tablist">
+                    <li class="nav-item">
+                      <a class="nav-link active" data-toggle="tab" href="#addCity" role="tab" aria-expanded="true">Add City</a>
+                    </li>
+                    <li class="nav-item">
+                      <a class="nav-link" data-toggle="tab" href="#deactivateCity" role="tab" aria-expanded="false">Deactivate City</a>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+              <div id="my-tab-content" class="tab-content text-center">
+                <div class="tab-pane active" id="addCity" role="tabpanel" aria-expanded="true">
+                    <div class="col-md-12">
+                        <div class="card ">
+                        <div class="card-header ">
+                            <h4 class="card-title">Add City</h4>
+                        </div>
+                        <div class="card-body ">
+                            <form class="form-horizontal" method="POST" action="/admin/addCity">
+                                <div class="row">
+                                    <label class="col-md-3 col-form-label">State</label>
+                                    <select class="selectpicker" data-style="btn btn-info btn-round" title="Choose State">
+                                        <option value="Bihar">Bihar</option>
+                                        <option value="Jharkhand">Jharkhand</option>
+                                        <option value="Orrisa">Orrisa</option>
+                                      </select>
+                                </div>
+                                <div class="row">
+                                    <label class="col-md-3 col-form-label">City</label>
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <input type="text" name="city" id="typeahead" class="form-control" placeholder="City">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="card-footer ">
+                                    <div class="row">
+                                    <div class="col-md-4">
+                                        <button type="submit" class="btn btn-info btn-round">Add</button>
+                                    </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="tab-pane" id="deactivateCity" role="tabpanel" aria-expanded="false">
+                      <form action="">
+                        <div class="row">
+                        <select class="selectpicker" data-style="btn btn-info btn-round" multiple title="Choose City" data-size="7">
+                          <option disabled> Multiple Options</option>
+                          <option value="2">Paris </option>
+                          <option value="3">Bucharest</option>
+                          <option value="4">Rome</option>
+                          <option value="5">New York</option>
+                          <option value="6">Miami </option>
+                          <option value="7">Piatra Neamt</option>
+                          <option value="8">Paris </option>
+                          <option value="9">Bucharest</option>
+                          <option value="10">Rome</option>
+                          <option value="11">New York</option>
+                          <option value="12">Miami </option>
+                          <option value="13">Piatra Neamt</option>
+                          <option value="14">Paris </option>
+                          <option value="15">Bucharest</option>
+                          <option value="16">Rome</option>
+                          <option value="17">New York</option>
+                          <option value="18">Miami </option>
+                          <option value="19">Piatra Neamt</option>
+                        </select>
+                        <button type="submit" class="btn btn-info btn-round">Deactivate</button>
+                        </div>
+                      </form>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+    </div>
+</div>
+
+<!-- Footer -->
+<% include ../partials/footer %>
+<script src="/js/typeahead.bundle.js"></script>
+
+<script type="text/javascript">
+var substringMatcher = function(strs) {
+return function findMatches(q, cb) {
+  var matches, substringRegex;
+
+  // an array that will be populated with substring matches
+  matches = [];
+
+  // regex used to determine if a string contains the substring `q`
+  substrRegex = new RegExp(q, 'i');
+
+  // iterate through the pool of strings and for any string that
+  // contains the substring `q`, add it to the `matches` array
+  $.each(strs, function(i, str) {
+    if (substrRegex.test(str)) {
+      matches.push(str);
+    }
+  });
+
+  cb(matches);
+};
+};
+
+var states = ['Alabama', 'Alaska', 'Arizona', 'Arkansas', 'California',
+'Colorado', 'Connecticut', 'Delaware', 'Florida', 'Georgia', 'Hawaii',
+'Idaho', 'Illinois', 'Indiana', 'Iowa', 'Kansas', 'Kentucky', 'Louisiana',
+'Maine', 'Maryland', 'Massachusetts', 'Michigan', 'Minnesota',
+'Mississippi', 'Missouri', 'Montana', 'Nebraska', 'Nevada', 'New Hampshire',
+'New Jersey', 'New Mexico', 'New York', 'North Carolina', 'North Dakota',
+'Ohio', 'Oklahoma', 'Oregon', 'Pennsylvania', 'Rhode Island',
+'South Carolina', 'South Dakota', 'Tennessee', 'Texas', 'Utah', 'Vermont',
+'Virginia', 'Washington', 'West Virginia', 'Wisconsin', 'Wyoming'
+];
+
+$('#typeahead').typeahead({
+hint: false,
+minLength: 1,
+classNames: {
+input: 'Typeahead-input'
+}
+},
+{
+name: 'states',
+source: substringMatcher(states)
+});
+</script>

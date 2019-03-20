@@ -1,0 +1,55 @@
+<% include ../partials/header %>
+<% include ../partials/sidebar %>
+
+
+<div class="content">
+    <div class="row">
+        <div class="card-body ">
+            <form method="get" action="" class="form-horizontal">
+                <div class="row">
+                    <label class="col-sm-2 col-form-label">Fleet Type Name</label>
+                    <div class="col-sm-10">
+                    <div class="form-group">
+                        <input type="text" name="fleetType" class="form-control" placeholder="Fleet Type Name">
+                    </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <label class="col-sm-2 col-form-label">Capacity</label>
+                    <div class="col-sm-10">
+                    <div class="form-group">
+                        <input type="text" name="capacity" class="form-control" placeholder="Capacity">
+                    </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <label class="col-sm-2 col-form-label">Size</label>
+                    <div class="col-sm-10">
+                    <div class="row">
+                        <div class="col-md-1">
+                        <div class="form-group">
+                            <input type="text" name="l" class="form-control" placeholder="L">
+                        </div>
+                        </div>
+                        <div class="col-md-1">
+                        <div class="form-group">
+                            <input type="text" name="b" class="form-control" placeholder="B">
+                        </div>
+                        </div>
+                        <div class="col-md-1">
+                        <div class="form-group">
+                            <input type="text" name="h" class="form-control" placeholder="H">
+                        </div>
+                        </div>
+                        <label class="col-ls-3 label-on-right">
+                            <code>Kg</code>
+                        </label>
+                    </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<% include ../partials/footer %>

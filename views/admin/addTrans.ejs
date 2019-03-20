@@ -1,0 +1,208 @@
+<% include ../partials/header %>
+<% include ../partials/sidebar %>
+
+<div class="content">
+        <div class="row">
+            <div class="col-md-12">
+              <div class="card">
+                <div class="card-header">
+                  <h5>Transporter</h5>
+                </div>
+                <div class="card-body">
+                  <div class="nav-tabs-navigation">
+                    <div class="nav-tabs-wrapper">
+                      <ul id="tabs" class="nav nav-tabs" role="tablist">
+                        <li class="nav-item">
+                          <a class="nav-link active" data-toggle="tab" href="#addTrans" role="tab" aria-expanded="true">Add Transporter</a>
+                        </li>
+                        <li class="nav-item">
+                          <a class="nav-link" data-toggle="tab" href="#validateTrans" role="tab" aria-expanded="false">Validate Transporter</a>
+                        </li>
+                      </ul>
+                    </div>
+                  </div>
+                  <% include ../partials/message %>
+                  <div id="my-tab-content" class="tab-content text-center">
+                    <div class="tab-pane active" id="addTrans" role="tabpanel" aria-expanded="true">
+                        <div class="col-md-12">
+                            <div class="card ">
+                            <div class="card-header">
+                                <h4 class="card-title">Add Transporter</h4>
+                            </div>
+                            <div class="card-body ">
+                                <form class="form-horizontal" method="POST" action="/admin/addTrans">
+                                    <div class="row">
+                                        <label class="col-md-3 col-form-label">State</label>
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <input type="text" name="state" class="form-control" placeholder="State" required>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <label class="col-md-3 col-form-label">City</label>
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <input type="text" name="city" id="typeahead" class="form-control" placeholder="City" required>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <label class="col-md-3 col-form-label">Mobile No.</label>
+                                        <div class="col-md-6">
+                                        <div class="form-group">
+                                            <input type="text" class="form-control" name="mob" placeholder="Mobile Number" required>
+                                        </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <label class="col-md-3 col-form-label">Fleet</label>
+                                        <div class="col-md-6">
+                                        <div class="form-group">
+                                            <input type="text" class="form-control" name="fleet" placeholder="Fleet" required>
+                                        </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <label class="col-md-3 col-form-label">Username</label>
+                                        <div class="col-md-6">
+                                        <div class="form-group">
+                                            <input type="text" class="form-control" name="username" placeholder="Username" required>
+                                        </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <label class="col-md-3 col-form-label">Password</label>
+                                        <div class="col-md-6">
+                                        <div class="form-group">
+                                            <input type="password" name="password" class="form-control" placeholder="Password" required>
+                                        </div>
+                                        </div>
+                                    </div>
+                                    <div class="card-footer ">
+                                        <div class="row">
+                                        <label class="col-md-6"></label>
+                                        <div class="col-md-9">
+                                            <button type="submit" class="btn btn-info btn-round">Add</button>
+                                        </div>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="tab-pane" id="validateTrans" role="tabpanel" aria-expanded="false">
+                        <div class="col-md-12">
+                            <div class="card">
+                            <div class="card-header">
+                                <h4 class="card-title"> Transporters</h4>
+                            </div>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                <table class="table">
+                                    <thead class="text-primary">
+                                    <th>
+                                        Name
+                                    </th>
+                                    <th>
+                                        State
+                                    </th>
+                                    <th>
+                                        City
+                                    </th>
+                                    <th>
+                                        Mobile Number
+                                    </th>
+                                    <th>
+                                        Fleet Size
+                                    </th>
+                                    <th>
+                                        Actions
+                                    </th>
+                                    </thead>
+                                    <tbody>
+                                    <% for(var i = 0; i<trans.length ; i++) {%>
+                                    <tr>
+                                        <td>
+                                        <%= trans[i].name %>
+                                        </td>
+                                        <td>
+                                        <%= trans[i].state %>
+                                        </td>
+                                        <td>
+                                        <%= trans[i].city %>
+                                        </td>
+                                        <td>
+                                        <%= trans[i].mob %>
+                                        </td>
+                                        <td>
+                                        <%= trans[i].fleet_size %>
+                                        </td>
+                                        <td>
+                                        <button type="button" rel="tooltip" class="btn btn-info btn-icon btn-sm ">
+                                            <i class="fa fa-user"></i>
+                                        </button>
+                                        </td>
+                                    </tr>
+                            <% } %>
+                            </tbody>
+                        </table>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+        </div>
+    </div>
+
+
+<% include ../partials/footer %>
+<script src="/js/typeahead.bundle.js"></script>
+
+<script type="text/javascript">
+var substringMatcher = function(strs) {
+return function findMatches(q, cb) {
+  var matches, substringRegex;
+
+  // an array that will be populated with substring matches
+  matches = [];
+
+  // regex used to determine if a string contains the substring `q`
+  substrRegex = new RegExp(q, 'i');
+
+  // iterate through the pool of strings and for any string that
+  // contains the substring `q`, add it to the `matches` array
+  $.each(strs, function(i, str) {
+    if (substrRegex.test(str)) {
+      matches.push(str);
+    }
+  });
+
+  cb(matches);
+};
+};
+
+var states = ['Alabama', 'Alaska', 'Arizona', 'Arkansas', 'California',
+'Colorado', 'Connecticut', 'Delaware', 'Florida', 'Georgia', 'Hawaii',
+'Idaho', 'Illinois', 'Indiana', 'Iowa', 'Kansas', 'Kentucky', 'Louisiana',
+'Maine', 'Maryland', 'Massachusetts', 'Michigan', 'Minnesota',
+'Mississippi', 'Missouri', 'Montana', 'Nebraska', 'Nevada', 'New Hampshire',
+'New Jersey', 'New Mexico', 'New York', 'North Carolina', 'North Dakota',
+'Ohio', 'Oklahoma', 'Oregon', 'Pennsylvania', 'Rhode Island',
+'South Carolina', 'South Dakota', 'Tennessee', 'Texas', 'Utah', 'Vermont',
+'Virginia', 'Washington', 'West Virginia', 'Wisconsin', 'Wyoming'
+];
+
+$('#typeahead').typeahead({
+hint: false,
+minLength: 1,
+classNames: {
+input: 'Typeahead-input'
+}
+},
+{
+name: 'states',
+source: substringMatcher(states)
+});
+</script>
