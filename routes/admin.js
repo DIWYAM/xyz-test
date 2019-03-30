@@ -53,18 +53,15 @@ router.get('/addTrans',ensureAuthenticatedAdmin(),(req,res)=>{
 });
 
 router.get('/search', function(req, res){
-    console.log('Here');
     pool.getConnection((err,db)=>{
         if(err) throw err;
         db.query('SELECT city from cities where city like "%'+req.query.key+'%"',(err,rows)=>{
             if (err) throw err;
-            // if(rows.length){}
-            var data=[];
+                var data=[];
             for(i=0;i<rows.length;i++)
             {
             data.push(rows[i].city);
             }
-            console.log(JSON.stringify(data));
             res.send(JSON.stringify(data));
         });
     });

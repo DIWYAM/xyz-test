@@ -43,14 +43,8 @@
                                         <label class="col-md-3 col-form-label">City</label>
                                         <div class="col-md-6">
                                             <div class="form-group">
-                                                    <!-- <div id="remote">
-                                                            <input class="typeahead tt-query" id="city" type="text" autocomplete="off" placeholder="Oscar winners for Best Picture">
-                                                          </div> -->
-                                                <!-- <input class="typeahead form-control" id="typeahead" spellcheck="false" autocomplete="off" name="city" type="text" placeholder="City" required/> -->
                                                 <input type="text" name="city" id="city" class="form-control" placeholder="City" required>
-                                                <!-- <input class="typeahead tt-query" spellcheck="false" autocomplete="off" name="typeahead" type="text" /> -->
-                                                <!-- <input class="typeahead tt-query" spellcheck="false" autocomplete="off" name="typeahead" type="text" /> -->
-                                            </div>
+                                              </div>
                                         </div>
                                     </div>
                                     <div class="row">
@@ -196,28 +190,4 @@ $('#city').typeahead(null, {
     },
   source: city
 });
-
-// $(document).ready(function(){
-// $('input.typeahead').typeahead({
-// name: 'typeahead',
-// remote: '/admin/search?key=%QUERY',
-// limit: 10
-// });
-// });
-
-// var docs = new Bloodhound({
-//   datumTokenizer: Bloodhound.tokenizers.obj.whitespace('data'),
-//   queryTokenizer: Bloodhound.tokenizers.whitespace,
-//   remote: {
-//     remote: '/admin/search?key=%QUERY',
-//     wildcard: '%QUERY'
-//   }
-// });
-
-// $('#city').typeahead(null, {
-//   name: 'documents',
-//   display: 'value',
-//   source: docs
-// });
-
 </script>
