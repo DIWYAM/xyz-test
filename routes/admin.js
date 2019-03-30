@@ -16,7 +16,7 @@ router.get('/city',ensureAuthenticatedAdmin(),(req,res)=>{
     pool.getConnection((err,db)=>{
         if(err) throw err;
         else{
-            db.query('SELECT city,state FROM cities',(err,result)=>{
+            db.query('SELECT city FROM cities',(err,result)=>{
                 if(err) throw err;
                 else{
                     req.session.city = result;
@@ -38,12 +38,34 @@ router.get('/addDriver',(req,res)=>{
 });
 
 router.get('/addTrans',ensureAuthenticatedAdmin(),(req,res)=>{
+    // console.log(req.session.city);
+    // var city = JSON.stringify(req.session.city);
+    // console.log(city);
     pool.getConnection((err,db)=>{
         if(err) throw err;
         db.query("SELECT * FROM trans_tab",(err,result)=>{
             res.render('admin/addTrans',{
-                trans:result
+                trans:result,
+                city:req.session.city
             });
+        });
+    });
+});
+
+router.get('/search', function(req, res){
+    console.log('Here');
+    pool.getConnection((err,db)=>{
+        if(err) throw err;
+        db.query('SELECT city from cities where city like "%'+req.query.key+'%"',(err,rows)=>{
+            if (err) throw err;
+            // if(rows.length){}
+            var data=[];
+            for(i=0;i<rows.length;i++)
+            {
+            data.push(rows[i].city);
+            }
+            console.log(JSON.stringify(data));
+            res.send(JSON.stringify(data));
         });
     });
 });
