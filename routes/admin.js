@@ -72,21 +72,22 @@ router.get('/addTrans',ensureAuthenticatedAdmin(),(req,res)=>{
     });
 });
 
-router.get('/search', function(req, res){
+router.post('/search', function(req, res){
+   
     pool.getConnection((err,db)=>{
         if(err) throw err;
-        db.query('SELECT city from cities where city like "%'+req.query.key+'%"',(err,rows)=>{
-            if (err) throw err;
-                var data=[];
-            for(i=0;i<rows.length;i++)
-            {
-            data.push(rows[i].city);
-            }
-            res.send(JSON.stringify(data));
-        });
+        var sqlquery = 'SELECT id,city FROM cities WHERE state=?';
+        db.query(sqlquery,[req.body.state],(err,result)=>{
+            res.send(result);
+             //console.log(result[0])   
+               
+            });
+        
         db.release();
     });
+    
 });
+
 
 router.get('/search1',(req,res)=>{
     pool.getConnection((err,db)=>{
