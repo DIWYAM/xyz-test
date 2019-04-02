@@ -166,15 +166,13 @@
 
 
 <% include ../partials/footer %>
-<script src="/js/typeahead.bundle.js"></script>
-
 <script type="text/javascript">
-var city = new Bloodhound({
+/*var city = new Bloodhound({
   datumTokenizer: Bloodhound.tokenizers.obj.whitespace('city'),
   queryTokenizer: Bloodhound.tokenizers.whitespace,
 //   prefetch: '/admin/search?key=%QUERY',
   remote: {
-    url: '/admin/search?key=%QUERY',
+    url: '/admin/search?key=%QUERY&state=BIHAR',
     // transform: function (data) {
     // return data.response;
     // },
@@ -197,5 +195,38 @@ $('#city').typeahead(null, {
 
     },
   source: city
+});*/
+$(document).ready(function(){
+    $("#state").change(function(){
+        var state = $(this).children("option:selected").val();
+        
+    console.log(state);
+
+   $.ajax({
+        url: '/admin/search',
+        type: 'post',
+        data: {state:state},
+        dataType: 'json',
+        success:function(data){
+            data=JSON.stringify(data);
+               data=JSON.parse(data);
+             //  console.log(data);
+             // console.log(data[0].city)
+                var len = data.length;
+
+$("#id1").empty();
+
+
+for( var i = 0; i<len; i++){
+                var cid = data[i].id;
+                var city=data[i].city;
+                //console.log(city);
+                $("#id1").append("<option value='"+cid+"'>"+city+"</option>");
+
+}
+}
+            
+    });
+});
 });
 </script>
