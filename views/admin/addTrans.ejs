@@ -16,7 +16,7 @@
                           <a class="nav-link active" data-toggle="tab" href="#addTrans" role="tab" aria-expanded="true">Add Transporter</a>
                         </li>
                         <li class="nav-item">
-                          <a class="nav-link" data-toggle="tab" href="#validateTrans" role="tab" aria-expanded="false">Validate Transporter</a>
+                          <a class="nav-link" data-toggle="tab" href="#validateTrans" role="tab" aria-expanded="false">Transporter List</a>
                         </li>
                       </ul>
                     </div>
@@ -43,7 +43,7 @@
                                         <label class="col-md-3 col-form-label">City</label>
                                         <div class="col-md-6">
                                             <div class="form-group">
-                                                <input type="text" name="city" id="city" class="form-control" placeholder="City" required>
+                                                <input type="text" name="city" id="city" class="form-control"  required>
                                               </div>
                                         </div>
                                     </div>
@@ -56,7 +56,7 @@
                                         </div>
                                     </div>
                                     <div class="row">
-                                        <label class="col-md-3 col-form-label">Fleet</label>
+                                        <label class="col-md-3 col-form-label">Expected Fleet Size</label>
                                         <div class="col-md-6">
                                         <div class="form-group">
                                             <input type="text" class="form-control" name="fleet" placeholder="Fleet" required>
@@ -118,7 +118,7 @@
                                         Fleet Size
                                     </th>
                                     <th>
-                                        Actions
+                                       Added From
                                     </th>
                                     </thead>
                                     <tbody>
@@ -137,12 +137,20 @@
                                         <%= trans[i].mob %>
                                         </td>
                                         <td>
-                                        <%= trans[i].fleet_size %>
+                                        <%= trans[i].fleet %>
                                         </td>
                                         <td>
-                                        <button type="button" rel="tooltip" class="btn btn-info btn-icon btn-sm ">
-                                            <i class="fa fa-user"></i>
-                                        </button>
+                                            <% if(trans[i].add_by==0)
+                                            {%>
+                                                Added From Dashboard
+                                                <%}
+                                                else{
+                                                    %>
+                                                    Added From APP
+                                                    <%
+                                                }
+                                                %>
+                                       
                                         </td>
                                     </tr>
                             <% } %>

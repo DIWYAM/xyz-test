@@ -16,39 +16,59 @@ router.get('/city',ensureAuthenticatedAdmin(),(req,res)=>{
     pool.getConnection((err,db)=>{
         if(err) throw err;
         else{
-            db.query('SELECT city FROM cities',(err,result)=>{
+            db.query('SELECT * FROM cities;SELECT `id`, `state` FROM `state_list`',(err,result)=>{
                 if(err) throw err;
                 else{
-                    req.session.city = result;
+                    req.session.city = result[0];
                     res.render('admin/city',{
-                        city:result
+                        city:result[0],
+                        state:result[1]
                     });
                 }
             });
+            db.release();
         }
     });
 });
 
 router.get('/addFleet',ensureAuthenticatedAdmin(),(req,res)=>{
+    let d={
+        d:`D${req.session.city}`
+    }
+    console.log(d.d);
     res.render('admin/addFleet');
 });
 
-router.get('/addDriver',(req,res)=>{
-    res.render('admin/addDriver');
+router.get('/addDriver',ensureAuthenticatedAdmin(),(req,res)=>{
+    pool.getConnection((err,db)=>{
+        if(err) throw err;
+        else{
+            db.query('SELECT * FROM cities;SELECT trans_tab.*,driver_tab.* FROM trans_tab INNER JOIN driver_tab ON trans_tab.id=driver_tab.tid',(err,result)=>{
+                if(err) throw err;
+                else{
+                    console.log(result[1]);
+                    res.render('admin/addDriver',{
+                        trans:req.session.trans,
+                        city:result[0],
+                        driver:result[1]
+                    });
+                }
+            });
+            db.release();
+        }
+    });
 });
 
 router.get('/addTrans',ensureAuthenticatedAdmin(),(req,res)=>{
-    // console.log(req.session.city);
-    // var city = JSON.stringify(req.session.city);
-    // console.log(city);
+    // console.log(pool._allConnections.length);
     pool.getConnection((err,db)=>{
         if(err) throw err;
-        db.query("SELECT * FROM trans_tab",(err,result)=>{
+        db.query("SELECT trans_tab.*,count(vehicle_table.v_id) AS fleet FROM `trans_tab` LEFT JOIN `vehicle_table` ON trans_tab.id=vehicle_table.t_id GROUP BY trans_tab.id  ORDER BY fleet DESC",(err,result)=>{
             res.render('admin/addTrans',{
-                trans:result,
-                city:req.session.city
+                trans:result
             });
         });
+        db.release();
     });
 });
 
@@ -64,9 +84,29 @@ router.get('/search', function(req, res){
             }
             res.send(JSON.stringify(data));
         });
+        db.release();
     });
 });
 
+router.get('/search1',(req,res)=>{
+    pool.getConnection((err,db)=>{
+   if(err) throw err;
+   else
+   {
+    db.query('SELECT city from cities where city like "%'+req.query.key+'%"',(err,rows)=>{
+        if (err) throw err;
+            var data=[];
+        for(i=0;i<rows.length;i++)
+        {
+        data.push(rows[i].city);
+        }
+        res.send(JSON.stringify(data));
+    });
+   }
+   db.release();
+    });
+
+});
 router.get('/vehicles',ensureAuthenticatedAdmin(),(req,res)=>{
     pool.getConnection((err,db)=>{
         if(err) throw err;
@@ -80,6 +120,7 @@ router.get('/vehicles',ensureAuthenticatedAdmin(),(req,res)=>{
                 vehicles:null
             });
         });
+        db.release();
     });
 });
 
@@ -94,6 +135,7 @@ router.post('/login',function(req,res,next){
               failureFlash:true
             })(req,res,next);
         });
+        db.release();
       }); 
 });
 
@@ -116,17 +158,29 @@ router.post('/addTrans',function(req,res,next){
                     fleet_size:req.body.fleet,
                     mob:req.body.mob
                 }
-                db.query("INSERT INTO trans_tab (name,password,city,state,fleet_size,mob) VALUES (?,?,?,?,?,?)",[trans.name,trans.password,trans.city,trans.state,trans.fleet_size,trans.mob],function(err,result){
-                    if (err) {
-                      req.flash('error', err)
-                    }
-                    else{
-                      req.flash('success_msg','Transporter Added');
-                      res.redirect('/admin/addTrans');
-                    }
-                  });
+                bcrypt.genSalt(10,(err,salt)=>{
+                    bcrypt.hash(trans.password,salt,(err,hash)=>{
+                      if(err) throw err;
+                      trans.password = hash;
+                      db.query("INSERT INTO trans_tab (name,password,city,state,fleet_size,mob) VALUES (?,?,?,?,?,?)",[trans.name,trans.password,trans.city,trans.state,trans.fleet_size,trans.mob],function(err,result){
+                        if (err) {
+                          req.flash('error', err)
+                        }
+                        else{
+                            db.query("INSERT INTO trans_login (mob,password) VALUES (?,?)",[trans.mob,trans.password],(err,result)=>{
+                                if(err) throw err;
+                                else{
+                                    req.flash('success_msg','Transporter Added');
+                                    res.redirect('/admin/addTrans');
+                                }
+                            });
+                        }
+                      });
+                    });
+                });   
             }
         });
+        db.release();
     });
 });
 
@@ -157,6 +211,7 @@ router.post('/addFleet',function(req,res,next){
                   });
             }
         });
+        db.release();
     });
 });
 
@@ -164,7 +219,7 @@ router.get('/vehicles/:id',ensureAuthenticatedAdmin(),(req,res)=>{
     pool.getConnection((err,db)=>{
         if(err) throw err;
         var sqlquery = 'SELECT trans_tab.*,vehicle_table.* FROM trans_tab LEFT JOIN vehicle_table ON trans_tab.id=vehicle_table.t_id WHERE trans_tab.id = ?'
-        db.query(sqlquery,[req.params.id],(err,result)=>{
+            db.query(sqlquery,[req.params.id],(err,result)=>{
             if(err) throw err;
             else{
                 req.session.transid = req.params.id;
@@ -176,9 +231,11 @@ router.get('/vehicles/:id',ensureAuthenticatedAdmin(),(req,res)=>{
                 });
             }
         });
+        db.release();
     });
 });
 
+   
 router.post('/addVehicle',function(req,res,next){
     pool.getConnection((err,db)=>{
         if(err) throw err;
@@ -253,6 +310,7 @@ router.post('/addVehicle',function(req,res,next){
             }
         });    
     });
+    db.release();
     });
 });
 
@@ -267,7 +325,7 @@ router.post('/addCity',(req,res,next)=>{
     pool.getConnection((err,db)=>{
         if(err) throw err;
         else{
-            var sqlquery = 'SELECT city FROM cities where city = ?';
+            var sqlquery = 'SELECT city FROM cities WHERE city = ?';
             db.query(sqlquery,[req.body.city],(err,result)=>{
                 if(err) throw err;
                 else if(result.length){
@@ -290,7 +348,119 @@ router.post('/addCity',(req,res,next)=>{
                 }
             });
         }
-    })
+        db.release();
+    });
+});
+
+router.post('/addDriver',ensureAuthenticatedAdmin(),(req,res,next)=>{
+    pool.getConnection((err,db)=>{
+        if(err) throw err;
+        var form = new formidable.IncomingForm();
+        form.keepExtensions = true;
+        form.multiples = true;
+        form.parse(req,(err,fields,files)=>{
+        if (err) throw err;
+        var sqlquery1 = 'SELECT phn FROM driver_tab WHERE phn = ?';
+        db.query(sqlquery1,[fields.phn],(err,result)=>{
+            if(err) throw err;
+            else if(result.length){
+                req.flash('error_msg','Driver is already registered');
+                res.redirect('/admin/addDriver');
+            }
+            else{
+                if(files.prof_pic){
+                    var oldpath = files.prof_pic.path;
+                    var newpath = `./public/images/profile/${fields.phn}.jpg`;
+                    fs.move(oldpath, newpath)
+                        .then(()=>{
+                            console.log('Success');
+                        })
+                        .catch(err => {
+                            console.error(err)
+                        });
+                }
+                if(files.dl_pic_back){
+                    var oldpath = files.dl_pic_back.path;
+                    var newpath = `./public/images/dl_pic_back/${fields.phn}.jpg`;
+                    fs.move(oldpath, newpath)
+                        .then(()=>{
+                            console.log('Success');
+                        })
+                        .catch(err => {
+                            console.error(err)
+                        });
+                }
+                if(files.dl_pic_front){
+                    var oldpath = files.dl_pic_front.path;
+                    var newpath = `./public/images/dl_pic_front/${fields.phn}.jpg`;
+                    fs.move(oldpath, newpath)
+                        .then(()=>{
+                            console.log('Success');
+                        })
+                        .catch(err => {
+                            console.error(err)
+                        });
+                }
+                if(files.aadhar_front_pic){
+                    var oldpath = files.aadhar_front_pic.path;
+                    var newpath = `./public/images/aadhar_front_pic/${fields.phn}.jpg`;
+                    fs.move(oldpath, newpath)
+                        .then(()=>{
+                            console.log('Success');
+                        })
+                        .catch(err => {
+                            console.error(err)
+                        });
+                }
+                db.query('SELECT COUNT(Did) AS noDid FROM driver_tab',(err,result)=>{
+                    if(err) throw err;
+                    else{
+                        console.log(result[0].noDid);
+                        var driver = {
+                            did:`Driver${result[0].noDid}`,
+                            d_name:fields.name,
+                            phn:fields.phn,
+                            prof_pic:`${fields.phn}.jpg`,
+                            aadhar_front_pic:`${fields.phn}.jpg`,
+                            dl_pic_front:`${fields.phn}.jpg`,
+                            dl_pic_back:`${fields.phn}.jpg`,
+                            verif_flag:false,
+                            city:fields.city,
+                            state:fields.state,
+                            birthday:fields.birthday,
+                            tid:fields.trans,
+                            add_by:'0',
+                            password:fields.password
+                        }
+                        console.log(driver.did);
+                        bcrypt.genSalt(10,(err,salt)=>{
+                            bcrypt.hash(driver.password,salt,(err,hash)=>{
+                                if(err) throw err;
+                                driver.password = hash;
+                                var sqlquery = 'INSERT INTO driver_tab (Did,d_name,phn,prof_pic,aadhar_front_pic,dl_pic_front,dl_pic_back,verif_flag,city,state,birthday,tid,add_by,password) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)'
+                                db.query(sqlquery,[driver.did,driver.d_name,driver.phn,driver.prof_pic,driver.aadhar_front_pic,driver.dl_pic_front,driver.dl_pic_back,driver.verif_flag,driver.city,driver.state,driver.birthday,driver.tid,driver.add_by,driver.password],(err,result)=>{
+                                    if(err){
+                                        console.log(err);
+                                    }
+                                    else{
+                                        db.query('INSERT INTO driver_login (Did,phn,password) VALUES (?,?,?)',[driver.did,driver.phn,driver.password],(err,result)=>{
+                                            if(err) throw err;
+                                            else{
+                                                req.flash('success_msg','Driver Added');
+                                                res.redirect(`/admin/addDriver`);
+                                            }
+                                        }); 
+                                    }
+                                });
+                            });
+                        });
+                    }
+                });
+            }
+        });    
+    });
+        db.release();
+    });
 });
 
 router.get('/logout',(req,res)=>{

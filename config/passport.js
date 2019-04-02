@@ -22,6 +22,7 @@ module.exports =
             return done(null,false,{message:'Incorrect Email'});
             }
         });
+        db.release();
         });
     }));
 
@@ -38,6 +39,7 @@ module.exports =
               else{ done(err,null); }
             }
           });
+          db.release();
         });
       });
 }

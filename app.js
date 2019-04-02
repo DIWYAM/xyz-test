@@ -5,12 +5,12 @@ const methodOverride = require('method-override');
 const session = require('express-session');
 const flash = require('connect-flash');
 const passport = require('passport');
-const connection = require('express-myconnection');
+// const connection = require('express-myconnection');
 var mysql = require('mysql');
 
 const app=express();
 const admin=require('./routes/admin');
-
+//const pool = require('../config/database');
 const PORT=process.env.PORT||3000;
 
 app.set('view engine', 'ejs');
@@ -42,7 +42,7 @@ require('./config/passport')(passport);
 
 app.get('/',(req,res)=>{
     res.render("index");
-  });
+});
 
 app.use('/admin',admin);
 

@@ -13,6 +13,7 @@ pool.getConnection((err,db) => {
       throw err;
   }
   console.log('SQL Connected');
+  db.release();
 });
 
 module.exports = pool;
